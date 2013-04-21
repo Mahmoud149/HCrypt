@@ -100,7 +100,7 @@ class Hill(object):
     def mult_message(self,m,k):
         newM = []
         for i in range(0,len(m)):
-            x = np.matrix(m[i])
+            x = np.matrix(m[i])#,copy=True)
             x.resize((len(k),1))
             z = np.array(k * x).reshape(-1).tolist()
             for j in z:
@@ -114,13 +114,38 @@ class Hill(object):
         return ''.join(self.to_chars(self.mult_message(self.byteS,key)))
 
 
-    def decode(self,k): # Hill decodes string s with a key k[n][n]
+    def decode(self,k,opt=None): # Hill decodes string s with a key k[n][n]
+        if opt == None:
+            fopt = self.byteS
+        else:
+            fopt = opt
         key = self.invert(np.matrix(k))
-        return ''.join(self.to_chars(self.mult_message(self.byteS,key)))
+        return ''.join(self.to_chars(self.mult_message(fopt,key)))
 
     def decode_sect(self,k):
+        qq = []
+        qq.append(self.byteS[0])
+        qq.append(self.byteS[1])
+        return self.decode(k,qq)
+        '''
         key = self.invert(np.matrix(k))
-        return ''.join(self.to_chars(self.mult_message(self.byteS[0],key)))
+        z = []
+        for i in range(0,len(k)):
+            z.append(self.byteS[0][i])
+        x = np.zeros((len(k),1),np.int8)
+        for i in range(0,len(k)):
+            x[i][0] = z[i]
+        x = np.matrix(x)
+        q = np.array(np.matrix(z) * key).reshape(-1).tolist()
+        
+        for i in range(0,len(q)):
+            q[i] %= CHAR_LENGTH
+        print q
+        cc = ''.join(self.to_chars(q))
+        #print cc
+        return cc
+        '''
+
 
 '''
 ht = Hill(open("FOT.txt",'r').read(),5)

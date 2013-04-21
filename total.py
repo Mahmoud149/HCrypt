@@ -18,7 +18,12 @@ class Total(object):
             self.ana.ht.switch_byteS()
             for j in range(0,min(len(keys),KEY_LEN)):
                 decoded = self.ana.ht.decode_sect(keys[j])
-                if decoded[0] == plaint[0] and decoded[1] == plaint[1] and decoded[2] == plaint[2]:
+                #print decoded
+                bu = True
+                for x in range(0,len(decoded)):
+                    if decoded[x] != plaint[x]:
+                        bu = False
+                if bu:
                     return keys[j]
             self.ana.ht.switch_byteS()
 
