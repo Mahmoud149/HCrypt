@@ -1,0 +1,1 @@
+hope yall dont go to amherst
