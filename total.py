@@ -32,11 +32,16 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description='Cryptanalyze hill cipher')
     p.add_argument('plaintext', metavar='pt')
     p.add_argument('ciphertext',metavar='ct')
+    p.add_argument('cp2')
     arg = p.parse_args()
 
     t = Total(arg.plaintext,arg.ciphertext).looper()
     
     if t != None:
+        print 'Found key:'
+        print t
+        print
+        print 'Writing decrypted files out...'
         ess = []
         q = numpy.array(t)
     
@@ -44,13 +49,19 @@ if __name__ == '__main__':
             for h in range(0,len(q)):
                 ess.append(q[j][h])
 
-        f = open("KEY",'w')
+        f = open("DP_KEY",'w')
         cPickle.dump(ess,f)
         f.close()
-        
-        print "wrote key file out"
-        print
-        print q
+
+        f = open("DECRYPT_KEY",'w')
+        f.write(str(q))
+        f.close()
+
+        g = open(arg.cp2,'r').read()
+        h2 = hill_tools.Hill(g,len(t))
+        f = open("DECRYPT_TXT",'w')
+        f.write(h2.decode(t))
+        f.close()
     else:
         print "no key found; try manual"
 
