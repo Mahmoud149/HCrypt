@@ -107,17 +107,6 @@ def encode(s,k): # Hill encodes string s with a key k[n][n]
     byteE = mult_message(byteS,key)
     return ''.join(to_chars(byteE))
 
-'''
-def tencode(s,k): # Hill encodes string s with a key k[n][n]
-    byteS = s
-    key = np.matrix(k)
-    while (len(byteS) % len(k) != 0):
-        byteS.append(byteS[len(byteS)-1])
-    byteS = prepare_message(byteS,len(k))
-    byteE = mult_message(byteS,key)
-    return byteE
-'''
-
 
 def decode(s,k): # Hill decodes string s with a key k[n][n]
     byteS = to_bytes(s)
@@ -125,39 +114,3 @@ def decode(s,k): # Hill decodes string s with a key k[n][n]
     byteS = prepare_message(byteS,len(k))
     byteE = mult_message(byteS,key)
     return ''.join(to_chars(byteE))
-'''
-
-x = [5,17,8,3,0,24]
-k = [[7,19],
-     [8,3]]
-
-print tencode(x,k)
-[20, 13, 9, 21, 14, 20]
-U
-'''
-
-#TEST FOR FINDING KEY
-'''
-print to_bytes(encode(make_id_s(3),[[22,13,1],
-                                    [11,1,5],
-                                    [62,11,12]]))
-
-
-x =  np.matrix([[22,13,1],
-                [11,1,5],
-                [62,11,12]])
-y = invert(x)
-z = np.array(x * y)
-for i in range(0,len(z)):
-    for j in range(0,len(z)):
-        z[i][j] %= CHAR_LENGTH
-print z
-
-'''
-'''
-x = np.matrix([[121,32,114],
-               [117,110,115],
-               [32,119,105]])
-print invert(x)
-print invert(x) * x
-'''

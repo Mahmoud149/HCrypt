@@ -147,13 +147,12 @@ if __name__ == '__main__':
         f.close()
         ess = []
         q = np.array(z[i])
-    #print q
+
         for j in range(0,len(q)):
             for h in range(0,len(q)):
                 ess.append(q[j][h])
-    #print ess
+    
         f = open((base+(str(i)))+"key",'w')
         cPickle.dump(ess,f)
         f.close()
-    #sys.exit(0) 
         print "wrote",zek,"files to out dir"
