@@ -3,3 +3,5 @@ out/*
 *.txt
 old/*
 old/
+others/*
+others/
