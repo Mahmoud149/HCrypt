@@ -3,7 +3,7 @@
 #Written by Evan Ricketts, April 2013
 
 import numpy as np
-import sys, math
+import sys, math, cPickle
 
 CHAR_LENGTH = 256 # the number of chars available to the current alphabet
 
@@ -33,24 +33,33 @@ class Hill(object):
         self.byteS = self.ciphS
         self.ciphS = temp
 
-    def determinant_inverse(self,m): # returns inverse of numpy.matrix M's determinant
-        detM = round(np.linalg.det(m))
-        detM = detM % CHAR_LENGTH
-        return self.__mod_inverse__(int(detM))
-    
 
-    def __mod_inverse__(self,m):  # returns (inverse of m) % CHAR_LENGTH
+    def laplace(self,array):
+        if len(array) == 2:
+            x = (array[0][0] * array[1][1]) % 256
+            y = (array[0][1] * array[1][0]) % 256
+            return ((x - y)) % 256
+        else:
+            z = 0
+            for i in range(0,len(array)):
+                a = int(round(math.pow(-1,((1)+(i+1)))))
+                b = array[0][i]
+                c = self.laplace(self.delete_at(array,i,0)) 
+                z += (((a*b*c)) % 256)
+            return z  % 256
+                
+
+    def mod_inverse(self,m):  # returns (inverse of m) % CHAR_LENGTH
         for i in range(0,CHAR_LENGTH):
             if ((m*i)%CHAR_LENGTH == 1):
                 return i
-    # else no inverse exists:
-        print "There exists no inverse of your key. Sorry!"
-        sys.exit(0)
+        # else no inverse exists:
+        return None
 
 
-    def __delete_at(self,em,i,j): # return em with row i, column j removed
+    def delete_at(self,em,i,j): # return em with row i, column j removed
         m = np.array(em)
-        ret = np.zeros((len(m)-1,len(m)-1),np.int8)
+        ret = np.zeros((len(m)-1,len(m)-1))
         p = 0
         for x in range(0,len(ret)):
             n = 0
@@ -64,51 +73,48 @@ class Hill(object):
             p += 1
         return ret
 
-
+    
     def adjugate(self,m): # make the modulo adjugate matrix of m
-        ret = np.zeros((len(m),len(m)),np.int8)
+        ret = np.zeros((len(m),len(m)))#,np.int8)
         for i in range(0,len(m)):
             for j in range(0,len(m)):
-                ret[j][i] = (((-1)**(i + j)) * (round(np.linalg.det(self.__delete_at(m,j,i))) % CHAR_LENGTH))%CHAR_LENGTH
+                ret[j][i] = ((((-1)**(i+j))) * self.laplace(self.delete_at(m,j,i))) % 256
         return ret
 
     
     def invert(self,matrix):
-        return self.determinant_inverse(matrix) * self.adjugate(matrix)
-
-
-    def to_bytes(self,string): # puts string in array of bytes representing chars of str
+        x = self.mod_inverse(self.laplace(matrix))
+        y = self.adjugate(matrix)
+        return x * y
+    
+    def to_bytes(self,string):
         return [ord(char) for char in string]
-
 
     def to_chars(self,byts): # reverse of to_bytes, but returns char array, not string
         return [chr(int(round(byte))) for byte in byts]
 
-
+    
     def prepare_message(self,m,kL): # splits byte[] m into kL equal parts
-        newM = []
-        while (len(m) % kL != 0):
-            m.append(m[len(m)-1])
-        for i in range(0,(len(m)/kL)):
-            splart = []
-            for j in range(i*kL,((i*kL)+kL)):
-                splart.append(m[j])
-            newM.append(splart)
-        return newM
+        ret = [m[i:i+kL] for i in xrange(0,len(m),kL)]
+        lastIdx = len(ret) - 1
+        while len(ret[lastIdx]) < kL:
+            ret[lastIdx].append(0)
+        return ret
 
 
     def mult_message(self,m,k):
         newM = []
         for i in range(0,len(m)):
-            x = np.matrix(m[i])#,copy=True)
-            x.resize((len(k),1))
+            x = np.zeros((len(m[i]),1))
+            for j in range(0,len(m[i])):
+                x[j][0] = m[i][j]
+            x = np.matrix(x)
             z = np.array(k * x).reshape(-1).tolist()
             for j in z:
                 newM.append(j%CHAR_LENGTH)
         return newM
 
             
-
     def encode(self,k): # Hill encodes string s with a key k[n][n]
         key = np.matrix(k)
         return ''.join(self.to_chars(self.mult_message(self.byteS,key)))
@@ -119,41 +125,35 @@ class Hill(object):
             fopt = self.byteS
         else:
             fopt = opt
-        key = self.invert(np.matrix(k))
+        key = np.matrix(self.invert(np.array(k)))
         return ''.join(self.to_chars(self.mult_message(fopt,key)))
 
+    
     def decode_sect(self,k):
         qq = []
         qq.append(self.byteS[0])
         qq.append(self.byteS[1])
         return self.decode(k,qq)
-        '''
-        key = self.invert(np.matrix(k))
-        z = []
-        for i in range(0,len(k)):
-            z.append(self.byteS[0][i])
-        x = np.zeros((len(k),1),np.int8)
-        for i in range(0,len(k)):
-            x[i][0] = z[i]
-        x = np.matrix(x)
-        q = np.array(np.matrix(z) * key).reshape(-1).tolist()
         
-        for i in range(0,len(q)):
-            q[i] %= CHAR_LENGTH
-        print q
-        cc = ''.join(self.to_chars(q))
-        #print cc
-        return cc
-        '''
 
 
-'''
-ht = Hill(open("FOT.txt",'r').read(),5)
-out = open("UT.txt",'w')
-out.write(ht.decode(np.matrix([[9, 10, 0, 20, 7],
-                               [4, 3, 14, 23, 16],
-                               [7, 2, 5, 7, 5],
-                               [21, 1, 25, 3, 1],
-                               [1, 5, 4, 3, 0]])))
-out.close()
-'''
+if __name__ == '__main__':
+    f = open('out/0','r')
+    pre = cPickle.load(f)
+    f.close()
+    l = len(pre)
+    f = open('h5ericketts.ciphertext','r')
+    fil = f.read()
+    f.close()
+    ht = Hill(fil,l)
+
+    f = open('DECRYPT_KEY','w')
+    f.write(str(pre))
+    f.close()
+
+    f = open('DECRYPT_T','w')
+    f.write(ht.decode(pre))
+    f.close()
+
+
+    

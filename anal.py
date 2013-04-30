@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 #requires having 'numpy' library installed  
-# 3x3: 1 34 54 8 69 2 5 5 1 
+
+# A python script for running cryptanalysis on a known plaintext/ciphertext
+# hill cipher pairing; requires a suspected length be specified
+# by Evan Ricketts, April 2013
+
+# Note: apparently numpy has issues with doing determinants reliably
+# on larger matrices, hence the usage of more CPU costly Laplace expansion here 
 
 import numpy as np
 import hill_tools 
@@ -8,7 +14,6 @@ import sys, math, argparse, cPickle
 
 
 MKEY_LEN = 4
-
 
 class Anal(object):
 
@@ -24,26 +29,12 @@ class Anal(object):
         self.keylen = newKeyLen
 
 
-    def det_inv(self,mat):
-        detM = round(np.linalg.det(mat))
-        detM = detM % hill_tools.CHAR_LENGTH
-        return self.mod_inv(int(detM))
-    
-    
-    def mod_inv(self,n):
-        for i in range(0,hill_tools.CHAR_LENGTH):
-            if ((n*i)%hill_tools.CHAR_LENGTH == 1):
-                return i
-        return None
-
-
     def do(self):
-        plainLen = len(self.ht.byteS)
+        plainLen = len(self.ht.text)
         zed = []
         offset = 0
-        plainBytes = np.zeros((self.keylen,self.keylen),np.int8)
-        ciphBytes = np.zeros((self.keylen,self.keylen),np.int8)
-
+        plainBytes = np.zeros((self.keylen,self.keylen))
+        ciphBytes = np.zeros((self.keylen,self.keylen))
         while True:
             track = offset
             for i in range(0,self.keylen):
@@ -51,35 +42,34 @@ class Anal(object):
                     plainBytes[i][j] = self.ht.text[track]
                     ciphBytes[i][j] = self.ht.ciph[track]
                     track += 1
-            inv = self.det_inv(np.matrix(plainBytes))
+            inv = self.ht.mod_inverse(self.ht.laplace(plainBytes))
             
-            
-            if (offset+1+(self.keylen*self.keylen) > plainLen) or (len(zed) == MKEY_LEN) or (offset > 15*self.keylen):
+            if (inv != None):
+                invPt = (inv * np.matrix(self.ht.adjugate(plainBytes)))%hill_tools.CHAR_LENGTH
+                
+                x = (np.array(invPt * np.matrix(ciphBytes)))%hill_tools.CHAR_LENGTH
+                x = np.swapaxes(x,0,1)
+
+                if self.ht.mod_inverse(self.ht.laplace(x)) != None:
+                    zed.append(x)
+            offset += 1
+            if (offset+(self.keylen*self.keylen) > plainLen) or len(zed) > MKEY_LEN: 
                 return zed
-            elif (inv != None):
-                invPt = (inv * self.ht.adjugate(np.matrix(plainBytes)))%hill_tools.CHAR_LENGTH
-                x = (np.array(invPt * np.matrix(ciphBytes)))#%hill_tools.CHAR_LENGTH
-                for i in range(0,len(x)):
-                    for j in range(0,len(x)):
-                        x[i][j] %= hill_tools.CHAR_LENGTH
-                z = []
-                for i in range(0,len(x)):
-                    for j in range(0,len(x)):
-                        z.append(x[j][i])
-                tr = 0
-                for i in range(0,len(x)):
-                    for j in range(0,len(x)):
-                        x[i][j] = z[tr]
-                        tr += 1
-                if self.det_inv(np.matrix(x)) != None:
-                    zed.append(np.matrix(x))
-                offset += 1
-            else:
-                offset += 1
-        
-'''
-anal = Anal("OUT.txt","FOT.txt",5)
-q = anal.do()
-for j in q:
-    print j
-'''
+
+
+if __name__ == '__main__':
+    a = argparse.ArgumentParser()
+    a.add_argument("plain")
+    a.add_argument("ciph")
+    a.add_argument("ks",type=int)
+    p = a.parse_args()
+
+    anal = Anal(p.plain,p.ciph,p.ks)
+    q = anal.do()
+    print "Found",str(len(q)),"possible keys; writing out now."
+    
+    for i in range(0,len(q)):
+        f = open(("out/"+str(i)),'w')
+        cPickle.dump(q[i],f)
+        f.close()
+
