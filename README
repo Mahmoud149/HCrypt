@@ -1,5 +1,5 @@
 **UPDATE AUGUST 30**
-this still requires the numpy library. presently, the code is back to being much slower, because of either: a bug in numpy's software for reliably finding the determinant of large matrices, which seems quite unlikely, but is evidenced by wolfram's mathematica corroborating the incorrectness; or something that someone else screwed up in providing me test files. it now uses a horridly slow Laplace expansion thing to do determinants, and does some other really inefficient things. but it works.
+this still requires the numpy library. presently, the code is back to being much slower, because of either: a bug in numpy's software for reliably finding the determinant of large matrices, which seems quite unlikely, but is evidenced by wolfram's mathematica corroborating the incorrectness; or something that someone else screwed up in providing me test files. it now uses a very, very slow Laplace expansion thing to do determinants; but it works.
 
 **UPDATE AUGUST 10**
 this requires the numpy library. presently, the code is much faster and more efficient.
