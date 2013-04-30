@@ -6,7 +6,6 @@
 
 import argparse, numpy, cPickle, math, sys, hill_tools
 
-
 p = argparse.ArgumentParser(description="Hill quick decoder")
 p.add_argument('in_txt',metavar='--in-text')
 p.add_argument('in_key',metavar='--in-key')
