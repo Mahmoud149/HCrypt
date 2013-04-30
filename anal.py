@@ -49,9 +49,10 @@ class Anal(object):
                 
                 x = (np.array(invPt * np.matrix(ciphBytes)))%hill_tools.CHAR_LENGTH
                 x = np.swapaxes(x,0,1)
+                key_det = self.ht.mod_inverse(self.ht.laplace(x))
 
-                if self.ht.mod_inverse(self.ht.laplace(x)) != None:
-                    zed.append(x)
+                if key_det != None:
+                    zed.append((x,key_det))
             offset += 1
             if (offset+(self.keylen*self.keylen) > plainLen) or len(zed) > MKEY_LEN: 
                 return zed

@@ -82,8 +82,11 @@ class Hill(object):
         return ret
 
     
-    def invert(self,matrix):
-        x = self.mod_inverse(self.laplace(matrix))
+    def invert(self,matrix,det=None):
+        if not det:
+            x = self.mod_inverse(self.laplace(matrix))
+        else:
+            x = det
         y = self.adjugate(matrix)
         return x * y
     
@@ -120,20 +123,20 @@ class Hill(object):
         return ''.join(self.to_chars(self.mult_message(self.byteS,key)))
 
 
-    def decode(self,k,opt=None): # Hill decodes string s with a key k[n][n]
+    def decode(self,k,opt=None,det=None): # Hill decodes string s with a key k[n][n]
         if opt == None:
             fopt = self.byteS
         else:
             fopt = opt
-        key = np.matrix(self.invert(np.array(k)))
+        key = np.matrix(self.invert(np.array(k),det))
         return ''.join(self.to_chars(self.mult_message(fopt,key)))
 
     
-    def decode_sect(self,k):
+    def decode_sect(self,k,det):
         qq = []
         qq.append(self.byteS[0])
         qq.append(self.byteS[1])
-        return self.decode(k,qq)
+        return self.decode(k,qq,det)
         
 
 

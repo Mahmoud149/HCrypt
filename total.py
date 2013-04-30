@@ -16,7 +16,8 @@ class Total(object):
             keys = self.ana.do()
             self.ana.ht.switch_byteS()
             for j in range(0,len(keys)):
-                decoded = self.ana.ht.decode_sect(keys[j])#partial decode;faster
+                key, det = keys[j]
+                decoded = self.ana.ht.decode_sect(key,det)#partial decode;faster
                 bu = True
                 for x in range(0,len(decoded)):
                     if decoded[x] != plaint[x]:
@@ -35,7 +36,8 @@ if __name__ == '__main__':
     p.add_argument('-s',metavar='--start',type=int,help='start value for key size to test')
     arg = p.parse_args()
 
-    t = Total(arg.plaintext,arg.ciphertext).looper()
+    t, z = Total(arg.plaintext,arg.ciphertext).looper()
+    
     
     if t != None:
         print 'Found key:'
@@ -49,18 +51,18 @@ if __name__ == '__main__':
             for h in range(0,len(q)):
                 ess.append(q[j][h])
 
-        f = open("DP_KEY",'w')
-        cPickle.dump(ess,f)
-        f.close()
+        #f = open("DP_KEY",'w')
+        #cPickle.dump(ess,f)
+        #f.close()
 
         f = open("DECRYPT_KEY",'w')
         f.write(str(q))
         f.close()
 
-        g = open(arg.cp2,'r').read()
+        g = open(arg.to_decode,'r').read()
         h2 = hill_tools.Hill(g,len(t))
         f = open("DECRYPT_TXT",'w')
-        f.write(h2.decode(t))
+        f.write(h2.decode(t,det=z))
         f.close()
     else:
         print "no key found; try manual"
