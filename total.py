@@ -64,5 +64,3 @@ if __name__ == '__main__':
         f.close()
     else:
         print "no key found; try manual"
-
-

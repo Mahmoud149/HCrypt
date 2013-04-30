@@ -154,6 +154,3 @@ if __name__ == '__main__':
     f = open('DECRYPT_T','w')
     f.write(ht.decode(pre))
     f.close()
-
-
-    

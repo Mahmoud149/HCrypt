@@ -72,4 +72,3 @@ if __name__ == '__main__':
         f = open(("out/"+str(i)),'w')
         cPickle.dump(q[i],f)
         f.close()
-
