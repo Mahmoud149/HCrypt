@@ -35,10 +35,8 @@ class Hill(object):
 
 
     def laplace(self,array):
-        if len(array) == 2:
-            x = (array[0][0] * array[1][1]) % 256
-            y = (array[0][1] * array[1][0]) % 256
-            return ((x - y)) % 256
+        if len(array) < 7:
+            return int(round(np.linalg.det(array)))
         else:
             z = 0
             for i in range(0,len(array)):
