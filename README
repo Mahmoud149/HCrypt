@@ -1,6 +1,7 @@
-**UPDATE AUGUST 30**
-this still requires the numpy library. presently, the code is back to being much slower, because of either: a bug in numpy's software for reliably finding the determinant of large matrices, which seems quite unlikely, but is evidenced by wolfram's mathematica corroborating the incorrectness; or something that someone else screwed up in providing me test files. it now uses a very, very slow Laplace expansion thing to do determinants; but it works.
+UPDATE MAY 1
+------------
+way faster again, so that total.py is actually usable. specify plaintext, ciphertext & ciphertext 2 paths like:
+<pre><code>python total.py plaintext.txt ciphertext.txt to-decode.txt
+</code></pre>
+and it will do its thing.
 
-**UPDATE AUGUST 10**
-this requires the numpy library. presently, the code is much faster and more efficient.
-this github has facilitated safely cleaning up the code.
