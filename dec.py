@@ -14,8 +14,7 @@ a = p.parse_args()
 f = open(a.in_key,'r')
 pre, praw = cPickle.load(f)
 f.close()
-#print pre
-#print praw
+
 l = len(pre)
 print 'decoding with inverse of\n',str(pre),'as key...'
 f = open(a.in_txt,'r')

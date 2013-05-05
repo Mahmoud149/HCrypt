@@ -36,6 +36,8 @@ if __name__ == '__main__':
     p.add_argument('-s',metavar='--start',type=int,help='start value for key size to test')
     arg = p.parse_args()
 
+    
+    
     t, z = Total(arg.plaintext,arg.ciphertext).looper()
     
     
@@ -46,7 +48,8 @@ if __name__ == '__main__':
         print 'Writing decrypted files out...'
         ess = []
         q = numpy.array(t)
-    
+
+            
         for j in range(0,len(q)):
             for h in range(0,len(q)):
                 ess.append(q[j][h])
@@ -55,13 +58,15 @@ if __name__ == '__main__':
         #cPickle.dump(ess,f)
         #f.close()
 
-        f = open("DECRYPT_KEY",'w')
+        f = open("my-key.txt",'w')
         f.write(str(q))
         f.close()
 
+        sprg = (arg.to_decode.split(".")[0])+".cleartext"
+
         g = open(arg.to_decode,'r').read()
         h2 = hill_tools.Hill(g,len(t))
-        f = open("DECRYPT_TXT",'w')
+        f = open(sprg,'w')
         f.write(h2.decode(t,det=z))
         f.close()
     else:

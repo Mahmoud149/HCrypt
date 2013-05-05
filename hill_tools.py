@@ -3,7 +3,7 @@
 #Written by Evan Ricketts, April 2013
 
 import numpy as np
-import sys, math, cPickle
+import sys, math, cPickle, argparse, math
 
 CHAR_LENGTH = 256 # the number of chars available to the current alphabet
 
@@ -81,7 +81,7 @@ class Hill(object):
 
     
     def invert(self,matrix,det=None):
-        if not det:
+        if det == None:
             x = self.mod_inverse(self.laplace(matrix))
         else:
             x = det
@@ -135,23 +135,3 @@ class Hill(object):
         qq.append(self.byteS[0])
         qq.append(self.byteS[1])
         return self.decode(k,qq,det)
-        
-
-
-if __name__ == '__main__':
-    f = open('out/0','r')
-    pre = cPickle.load(f)
-    f.close()
-    l = len(pre)
-    f = open('h5ericketts.ciphertext','r')
-    fil = f.read()
-    f.close()
-    ht = Hill(fil,l)
-
-    f = open('DECRYPT_KEY','w')
-    f.write(str(pre))
-    f.close()
-
-    f = open('DECRYPT_T','w')
-    f.write(ht.decode(pre))
-    f.close()
