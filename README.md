@@ -13,7 +13,7 @@ Individual Commands
 **anal.py** takes 3 paramaters: the first is the plaintext of the plaintext/ciphertext (p/c) pair, the second is the ciphertext of the p/c pair, and the third is the suspected key length.
 for greater control, anal.py's global variable MKEY_LENGTH can be manually edited to return a greater or smaller number of possible keys.
 
-**enc.py** is for quick encoding & key creation; the first arguement is the thing to encode, second is the key to use, third is where to save enciphered text, and fourth is where to save **dec.py** compatible key.
+**enc.py** is for quick encoding & key creation; the first argument is the thing to encode, second is the key to use, third is where to save enciphered text, and fourth is where to save **dec.py** compatible key.
 the key must be supplied in a text file as a string of numbers seperated by spaces. **enc.py** will also check to make sure that your key can be used to decipher and warn you if it cannot.
 
 **dec.py** is made for quick decoding: the first paramater is the path to the ciphertext, and the second paramater is the path to the key (cPickle'd numpy array format- what **anal.py** produces).
