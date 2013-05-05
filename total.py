@@ -53,16 +53,14 @@ if __name__ == '__main__':
         for j in range(0,len(q)):
             for h in range(0,len(q)):
                 ess.append(q[j][h])
-
-        #f = open("DP_KEY",'w')
-        #cPickle.dump(ess,f)
-        #f.close()
-
-        f = open("my-key.txt",'w')
+       
+        spirg = (arg.to_decode.split(".")[0])+"KEY.txt"
+        f = open(spirg,'w')
         f.write(str(q))
         f.close()
 
         sprg = (arg.to_decode.split(".")[0])+".cleartext"
+        
 
         g = open(arg.to_decode,'r').read()
         h2 = hill_tools.Hill(g,len(t))
